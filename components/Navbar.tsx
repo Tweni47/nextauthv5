@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import {
   NavigationMenu,
@@ -15,11 +13,15 @@ import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 
 import React from "react";
 import { cn } from "@/lib/utils";
+import { auth } from "@/auth";
+import Logout from "./Logout";
+import Image from "next/image";
+import { buttonVariants } from "./ui/button";
 
 const navLinks: { title: string; href: string; description: string }[] = [
   {
     title: "RSC Example",
-    href: "/docs/primitives/alert-dialog",
+    href: "/server",
     description: "Protecting React Server Component.",
   },
   {
@@ -29,12 +31,13 @@ const navLinks: { title: string; href: string; description: string }[] = [
   },
   {
     title: "Route Handler Example",
-    href: "/docs/primitives/progress",
+    href: "/api-route",
     description: "Getting the session inside an API route.",
   },
 ];
 
-const Navbar = () => {
+const Navbar = async () => {
+  const session = await auth();
   return (
     <nav className="border-b w-full flex items-center">
       <div className="flex w-full items-center justify-between my-4">
@@ -62,7 +65,7 @@ const Navbar = () => {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link href="/docs" legacyBehavior passHref>
+                <Link href="/client" legacyBehavior passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Client Side
                   </NavigationMenuLink>
@@ -73,11 +76,30 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-x-5">
-          <Link href="/sign-in">
-            <div className="bg-zinc-950 border border-zinc-700 px-5 py-2 rounded-sm hover:bg-zinc-700">
+          {!session?.user ? (
+            <Link
+              className={buttonVariants({ variant: "outline" })}
+              href="/sign-in"
+            >
               Login
-            </div>
-          </Link>
+            </Link>
+          ) : (
+            <>
+              <div className="flex items-center gap-x-2 text-sm">
+                {session?.user?.name}
+                {session?.user?.image && (
+                  <Image
+                    className="rounded-full"
+                    src={session?.user?.image || ""}
+                    alt="User Avatar"
+                    width={30}
+                    height={30}
+                  />
+                )}
+              </div>
+              <Logout />
+            </>
+          )}
         </div>
       </div>
     </nav>
