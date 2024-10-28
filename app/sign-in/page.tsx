@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -23,21 +23,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoginGithub from "@/components/LoginGithub";
-
-const formSchema = z.object({
-  email: z
-    .string()
-    .email()
-    .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
-  password: z
-    .string()
-    .min(8)
-    .regex(
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/
-    ),
-});
+import AuthButton from "@/components/AuthButton";
+import { useToast } from "@/hooks/use-toast";
+import { loginWithCreds } from "@/actions/auth";
+import { formSchema } from "@/lib/formSchema";
+import { useState } from "react";
+// import { redirect } from "next/navigation";
 
 const SignIn = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,9 +42,32 @@ const SignIn = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Here you would typically send the data to your backend
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    // Send the data to your backend
+    setIsLoading(true);
+    try {
+      const result = await loginWithCreds(values);
+      if (result.success) {
+        toast({
+          title: "Login Successful",
+          description: "You have been logged in successfully.",
+        });
+        // redirect("/");
+      } else {
+        toast({
+          title: "Login Failed",
+          description: result.error || "An unexpected error occurred.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Login Failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
@@ -89,9 +108,7 @@ const SignIn = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
+              <AuthButton />
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t" />
@@ -102,7 +119,8 @@ const SignIn = () => {
                   </span>
                 </div>
               </div>
-              <LoginGithub />
+
+              <LoginGithub disabled={isLoading} />
             </form>
           </Form>
           <div className="mt-4 text-center text-sm">
