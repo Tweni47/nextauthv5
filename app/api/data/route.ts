@@ -7,10 +7,15 @@
 // });
 
 import { auth } from "@/auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
+import { Session } from "next-auth";
 
-export const GET = auth(async function GET(req) {
+interface AuthenticatedRequest extends NextRequest {
+  auth: Session | null;
+}
+
+export const GET = auth(async (req: AuthenticatedRequest) => {
   const headersList = await headers();
   const authorization = headersList.get("authorization");
 
@@ -21,4 +26,4 @@ export const GET = auth(async function GET(req) {
     });
   }
   return NextResponse.json({ message: "Not Authenticated" }, { status: 401 });
-});
+}) as unknown as () => Promise<NextResponse>;
