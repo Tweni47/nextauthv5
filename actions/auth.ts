@@ -47,8 +47,7 @@ export const loginWithCreds = async (data: z.infer<typeof formSchema>) => {
     await signIn("credentials", {
       email,
       password,
-      redirectTo: "/",
-      redirect: true,
+      redirect: false,
     });
 
     return { success: true };

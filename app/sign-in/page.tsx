@@ -28,11 +28,12 @@ import { useToast } from "@/hooks/use-toast";
 import { loginWithCreds } from "@/actions/auth";
 import { formSchema } from "@/lib/formSchema";
 import { useState } from "react";
-// import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,13 +53,14 @@ const SignIn = () => {
           title: "Login Successful",
           description: "You have been logged in successfully.",
         });
-        // redirect("/");
+        router.push("/");
       } else {
         toast({
           title: "Login Failed",
           description: result.error || "An unexpected error occurred.",
           variant: "destructive",
         });
+        console.log(result.error);
       }
     } catch (error) {
       console.log(error);
@@ -67,6 +69,8 @@ const SignIn = () => {
         description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
