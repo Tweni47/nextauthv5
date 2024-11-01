@@ -10,7 +10,7 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 
-export const GET = auth(async function GET(req) {
+export const GET = auth(async function GET(req): Promise<NextResponse> {
   const headersList = await headers();
   const authorization = headersList.get("authorization");
 
