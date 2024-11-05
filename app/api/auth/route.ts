@@ -5,9 +5,13 @@ export async function GET(request: NextRequest) {
   const session = await auth();
 
   if (!session) {
-    return NextResponse.redirect(new URL("/", request.url));
+    const loginUrl = new URL("/sign-in", request.url);
+    return NextResponse.redirect(loginUrl);
   }
 
-  // If authenticated, redirect to home
+  // If authenticated, redirect to the protected page
+  // const protectedUrl = new URL("/middleware", request.url);
+  // return NextResponse.redirect(protectedUrl);
+
   return NextResponse.redirect(new URL("/", request.url));
 }
