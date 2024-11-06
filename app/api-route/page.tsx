@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+export const runtime = "edge";
 
 async function getAuthData() {
   const headersList = await headers();
