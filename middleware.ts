@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
-export const runtime = "experimental-edge";
+export const runtime = "nodejs";
 
 const protectedRoutes = ["/middleware"];
 
